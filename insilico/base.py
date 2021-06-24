@@ -200,3 +200,31 @@ class Experiment:
                     os.remove(file)
                 except FileNotFoundError:
                     pass
+
+
+def _set_kwarg(f, fixed_kwargs):
+    """Closure of a function fixing a kwarg"""
+
+    def f2(*args, **kwargs):
+        fixed_kwargs2 = {k: v for k, v in fixed_kwargs.items() if k not in kwargs}
+        return f(*args, **fixed_kwargs2, **kwargs)
+
+    return f2
+
+
+class SubExperiment(Experiment):
+    """An restriction of an experiment, where some of its variables are fixed"""
+
+    def __init__(self, original, fixed):
+        """
+
+        Args:
+            original (Experiment): The original experiment.
+            fixed (callable): A mapping from variable names to their fixed values.
+
+        """
+
+        variables = [a for a in original.variables if a.name not in fixed]
+        f = _set_kwarg(original.f, fixed)
+        store = original.store
+        super().__init__(variables, f, store)
