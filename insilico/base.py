@@ -164,12 +164,18 @@ class Experiment:
             Trial(kwargs, self.f, self.store).load_or_run()
 
     def iter_results(self):
-        """Iterate pairs of kwargs, results"""
+        """Iterate pairs of kwargs, results
+
+        If a result is not available, it is skipped
+        """
         for kwargs in self.iter_values():
-            yield kwargs, Trial(kwargs, self.f, self.store).load()
+            try:
+                yield kwargs, Trial(kwargs, self.f, self.store).load()
+            except FileNotFoundError:  # Not available
+                pass
 
     def get_results_df(self):
-        """Get a dataframe with the results"""
+        """Get a dataframe with the available results"""
         results = []
         for kwargs, result in self.iter_results():
             if isinstance(result, dict):
