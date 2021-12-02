@@ -10,6 +10,8 @@ from functools import reduce
 
 import pandas as pd
 
+from .common import is_notebook
+
 try:
     if not is_notebook():
         from tqdm import tqdm
