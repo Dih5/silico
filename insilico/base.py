@@ -11,8 +11,11 @@ from functools import reduce
 import pandas as pd
 
 try:
-    from tqdm.auto import tqdm
-except ModuleNotFoundError:
+    if not is_notebook():
+        from tqdm import tqdm
+    else:
+        from tqdm.notebook import tqdm
+except ImportError:
     def tqdm(*args, **kwargs):
         if args:
             return args[0]
