@@ -5,6 +5,7 @@ import json
 import os
 import pickle
 from glob import glob
+from datetime import datetime
 
 from functools import reduce
 
@@ -69,9 +70,15 @@ class Trial:
         """Execute the trial"""
         return self.f(**self.kwargs)
 
-    def run_and_save(self):
+    def run_and_save(self, add_stats=False):
         """Execute the trial and store the results as a pickle and in the db"""
-        result = self.run()
+        if add_stats:
+            result = self.run()
+        else:
+            start = datetime.now()
+            result = self.run()
+            elapsed = datetime.now() - start
+            result = {"_run_start": str(start), "_elapsed_seconds": elapsed.total_seconds(), **result}
         pickle.dump(result, open(os.path.join(self.base_path, self.get_file_name()), "wb"))
         return result
 
@@ -79,13 +86,13 @@ class Trial:
         """Load the results of the trial if available"""
         return pickle.load(open(os.path.join(self.base_path, self.get_file_name()), "rb"))
 
-    def load_or_run(self):
+    def load_or_run(self, add_stats=False):
         """Load the results if available, otherwise running the trial, storing the results, and returning them"""
         try:
             return self.load()
         except FileNotFoundError:
             pass
-        return self.run_and_save()
+        return self.run_and_save(add_stats=add_stats)
 
     def delete(self):
         """Remove the stored results of the trial"""
@@ -146,7 +153,7 @@ def implicit_variable_cast(variable):
 class Experiment:
     """An experiment"""
 
-    def __init__(self, variables, f, store, base_name=None):
+    def __init__(self, variables, f, store, base_name=None, add_stats=False):
         """
 
         Args:
@@ -154,12 +161,15 @@ class Experiment:
             f (callable): A function which maps variables names into results, which should be a dict.
             store (str): A path to store the results.
             base_name (str): Prefix for the file name. If None, a name will be extracted from f.
+            add_stats (bool): Whether to add running information to the results. If f's output is not a dict, this
+                              will fail.
 
         """
         self.variables = [implicit_variable_cast(v) for v in variables]
         self.f = f
         self.store = store
         self.base_name = base_name
+        self.add_stats = add_stats
 
         ensure_dir_exists(store)
 
@@ -177,7 +187,7 @@ class Experiment:
     def run_all(self):
         """Run all trials. If already run, kept."""
         for kwargs in tqdm(self.iter_values(), total=len(self)):
-            Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run()
+            Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
 
     def iter_results(self):
         """Iterate pairs of kwargs, results
