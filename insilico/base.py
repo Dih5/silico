@@ -9,7 +9,10 @@ from datetime import datetime
 
 from functools import reduce
 
-import pandas as pd
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
 from .common import is_notebook
 
@@ -202,6 +205,9 @@ class Experiment:
 
     def get_results_df(self):
         """Get a dataframe with the available results"""
+        if pd is None:
+            raise ModuleNotFoundError("The pandas package is required")
+
         results = []
         for kwargs, result in self.iter_results():
             if isinstance(result, dict):
