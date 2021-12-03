@@ -38,10 +38,21 @@ def _hash_function(w):
 class Trial:
     """A Trial able to provide a result from a dict of parameters"""
 
-    def __init__(self, kwargs, f, base_path=""):
+    def __init__(self, kwargs, f, base_path="", base_name=None):
+        """
+
+        Args:
+            kwargs (dict): Mapping of arguments to use in the call.
+            f (callable): Function called when performing the trial.
+            base_path (str): Path to the storage dir.
+            base_name (str): Prefix for the file name. If None, a name will be extracted from f.
+
+        """
         self.kwargs = kwargs
         self.f = f
         self.base_path = base_path
+
+        self.base_name = base_name if base_name is not None else f.__name__
 
         self.results = {}
 
@@ -52,7 +63,7 @@ class Trial:
 
     def get_file_name(self, extension=".pkl"):
         """Get a unique filename for the trial"""
-        return "%s-%s%s" % (self.f.__name__, self.get_hash(), extension)
+        return "%s-%s%s" % (self.base_name, self.get_hash(), extension)
 
     def run(self):
         """Execute the trial"""
@@ -135,17 +146,20 @@ def implicit_variable_cast(variable):
 class Experiment:
     """An experiment"""
 
-    def __init__(self, variables, f, store):
+    def __init__(self, variables, f, store, base_name=None):
         """
 
         Args:
             variables (list of Variable or (str, list) tuples): The list of variables.
             f (callable): A function which maps variables names into results, which should be a dict.
             store (str): A path to store the results.
+            base_name (str): Prefix for the file name. If None, a name will be extracted from f.
+
         """
         self.variables = [implicit_variable_cast(v) for v in variables]
         self.f = f
         self.store = store
+        self.base_name = base_name
 
         ensure_dir_exists(store)
 
@@ -163,7 +177,7 @@ class Experiment:
     def run_all(self):
         """Run all trials. If already run, kept."""
         for kwargs in tqdm(self.iter_values(), total=len(self)):
-            Trial(kwargs, self.f, self.store).load_or_run()
+            Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run()
 
     def iter_results(self):
         """Iterate pairs of kwargs, results
@@ -172,7 +186,7 @@ class Experiment:
         """
         for kwargs in self.iter_values():
             try:
-                yield kwargs, Trial(kwargs, self.f, self.store).load()
+                yield kwargs, Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
             except FileNotFoundError:  # Not available
                 pass
 
@@ -202,7 +216,7 @@ class Experiment:
         if only_grid:
             for kwargs in self.iter_values():
                 try:
-                    Trial(kwargs, self.f, self.store).delete()
+                    Trial(kwargs, self.f, self.store, base_name=self.base_name).delete()
                 except FileNotFoundError:
                     pass
         else:
