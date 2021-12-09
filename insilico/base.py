@@ -212,11 +212,11 @@ class Experiment:
     def iter_values(self):
         """Iterate all combinations of kwargs"""
         names = [v.name for v in self.variables]
-        mid_point = self.mid_point if self.mid_point is not None else {}
         if self.strategy == "grid":
             for t in product(*(v.iter_values() for v in self.variables)):
                 yield dict(zip(names, t))
         elif self.strategy == "star":
+            mid_point = self.mid_point if self.mid_point is not None else {}
             yield mid_point
             for v in self.variables:
                 for value in v.iter_values():
