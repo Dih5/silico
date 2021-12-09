@@ -1,3 +1,4 @@
+import warnings
 from itertools import product
 import base64
 import hashlib
@@ -103,8 +104,9 @@ def ensure_dir_exists(path):
 class Variable:
     """A variable taking part in an experiment"""
 
-    def __init__(self, name):
+    def __init__(self, name, standard=None):
         self.name = name
+        self.standard = standard
 
     def iter_values(self):
         raise NotImplementedError
@@ -113,13 +115,20 @@ class Variable:
 class GridVariable(Variable):
     """A variable whose values are defined on some grid points"""
 
-    def __init__(self, name, grid):
-        super(GridVariable, self).__init__(name)
+    def __init__(self, name, grid, standard=None):
+        super(GridVariable, self).__init__(name, standard=standard)
         self.grid = grid
 
     def iter_values(self):
         for v in self.grid:
             yield v
+
+    def get_standard(self):
+        if self.standard is not None:
+            return self.standard
+        l = list(self.grid)
+        length = len(l)
+        return sorted(l)[length // 2]
 
     def __len__(self):
         return len(self.grid)
@@ -135,21 +144,39 @@ def implicit_variable_cast(variable):
 class Experiment:
     """An experiment"""
 
-    def __init__(self, variables, f, store):
+    def __init__(self, variables, f, store, strategy="grid", mid_point=None):
         """
 
         Args:
             variables (list of Variable or (str, list) tuples): The list of variables.
             f (callable): A function which maps variables names into results, which should be a dict.
             store (str): A path to store the results.
+            strategy (str): A method defining how the parameter space is explore. Available options are:
+                            - "grid": Explore a grid in order (cartesian product)
+                            - "star": Consider only variations of each of the parameters. The "standard" point can
+                                      be defined with the mid_point parameter.
+            mid_point (dict of str): A mapping of parameters to their "default" values. Used if strategy is "star". The
+                                     mid_point must be in the grid.
+
         """
         self.variables = [implicit_variable_cast(v) for v in variables]
         self.f = f
         self.store = store
+        self.strategy = strategy
+
+        if strategy == "grid":
+            self._len = prod(len(v) for v in self.variables)
+        elif strategy == "star":
+            if mid_point is not None:
+                self.mid_point = mid_point
+            else:
+                warnings.warn("Not specifying a mid_point uses the median if available. ")
+                self.mid_point = {v.name: v.get_standard() for v in self.variables}
+
+            # Sum of lengths, but do not repeat the mid_point
+            self._len = sum(len(v) for v in self.variables) - len(self.variables) + 1
 
         ensure_dir_exists(store)
-
-        self._len = prod(len(v) for v in self.variables)
 
     def __len__(self):
         return self._len
@@ -157,8 +184,19 @@ class Experiment:
     def iter_values(self):
         """Iterate all combinations of kwargs"""
         names = [v.name for v in self.variables]
-        for t in product(*(v.iter_values() for v in self.variables)):
-            yield dict(zip(names, t))
+        mid_point = self.mid_point if self.mid_point is not None else {}
+        if self.strategy == "grid":
+            for t in product(*(v.iter_values() for v in self.variables)):
+                yield dict(zip(names, t))
+        elif self.strategy == "star":
+            yield mid_point
+            for v in self.variables:
+                for value in v.iter_values():
+                    if value != mid_point[v.name]:  # Do not repeat mid point
+                        yield {**mid_point, **{v.name: value}}
+
+        else:
+            raise ValueError("Invalid value for parameter strategy.")
 
     def run_all(self):
         """Run all trials. If already run, kept."""
