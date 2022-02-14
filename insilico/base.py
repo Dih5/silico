@@ -242,6 +242,10 @@ class Experiment:
             except FileNotFoundError:  # Not available
                 pass
 
+    def get_result(self, kwargs):
+        """Get the result of a certain configuration, running it if not available"""
+        return Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+
     def get_results_df(self):
         """Get a dataframe with the available results"""
         if pd is None:
