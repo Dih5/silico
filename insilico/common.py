@@ -18,3 +18,13 @@ def is_notebook():
     except NameError:
         # Surely not iPython
         return False
+
+
+def set_kwargs(f, fixed_kwargs):
+    """Closure of a function fixing some kwargs"""
+
+    def f2(*args, **kwargs):
+        fixed_kwargs2 = {k: v for k, v in fixed_kwargs.items() if k not in kwargs}
+        return f(*args, **fixed_kwargs2, **kwargs)
+
+    return f2
