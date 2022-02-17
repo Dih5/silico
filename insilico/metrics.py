@@ -53,3 +53,40 @@ def get_classification_metrics(y, predictions, classes=None):
             par_list.append((metric, np.nan))
 
     return OrderedDict(par_list)
+
+
+def plot_confusion_matrix(m, labels=None, figure_kwargs=None):
+    """
+
+    Args:
+        m (list of list of float): The confusion matrix.
+        labels (list of str): Names of the classes in the order of the confusion matrix.
+        figure_kwargs (dict): Parameters to create the Figure.
+
+        Returns:
+            Axes: An axes instance for further tweaking.
+    """
+    import matplotlib
+    import seaborn as sns
+
+    if figure_kwargs is None:
+        figure_kwargs = {}
+    fig = matplotlib.pyplot.figure(**figure_kwargs)
+
+    gs0 = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[20, 2], hspace=0.05)
+    gs00 = matplotlib.gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs0[1], hspace=0)
+
+    ax = fig.add_subplot(gs0[0])
+    cax1 = fig.add_subplot(gs00[0])
+    cax2 = fig.add_subplot(gs00[1])
+
+    vmin = np.min(m)
+    vmax = np.max(m)
+    off_diag_mask = np.eye(*m.shape, dtype=bool)
+
+    sns.heatmap(m, annot=True, mask=~off_diag_mask, cmap='Blues', vmin=vmin, vmax=vmax, ax=ax, cbar_ax=cax2,
+                )
+    sns.heatmap(m, annot=True, mask=off_diag_mask, cmap='OrRd', vmin=vmin, vmax=vmax, ax=ax, cbar_ax=cax1,
+                xticklabels=labels, yticklabels=labels, cbar_kws=dict(ticks=[]))
+
+    return ax
