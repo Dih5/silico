@@ -7,6 +7,7 @@ import os
 import pickle
 from glob import glob
 from datetime import datetime
+from multiprocessing import Pool
 
 from functools import reduce
 
@@ -226,10 +227,23 @@ class Experiment:
         else:
             raise ValueError("Invalid value for parameter strategy.")
 
-    def run_all(self):
+    def _run_kwargs(self, **kwargs):
+        """Helper pickleable function"""
+        Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+
+    def run_all(self, method="sequential", threads=2):
         """Run all trials. If already run, kept."""
-        for kwargs in tqdm(self.iter_values(), total=len(self)):
-            Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+        method = method.lower()
+        if method == "sequential":
+            for kwargs in tqdm(self.iter_values(), total=len(self)):
+                Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+        elif method == "multithreading":
+            with Pool(threads) as pool:
+                results = [pool.apply_async(self._run_kwargs, kwds=kwargs) for kwargs in self.iter_values()]
+                for result in tqdm(results, total=len(self)):
+                    result.get()
+        else:
+            raise ValueError("Invalid method")
 
     def iter_results(self):
         """Iterate pairs of kwargs, results
