@@ -89,4 +89,7 @@ def plot_confusion_matrix(m, labels=None, figure_kwargs=None):
     sns.heatmap(m, annot=True, mask=off_diag_mask, cmap='OrRd', vmin=vmin, vmax=vmax, ax=ax, cbar_ax=cax1,
                 xticklabels=labels, yticklabels=labels, cbar_kws=dict(ticks=[]))
 
+    ax.set_xlabel("True class")
+    ax.set_ylabel("Predicted class")
+
     return ax
