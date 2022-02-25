@@ -229,14 +229,22 @@ class Experiment:
 
     def _run_kwargs(self, **kwargs):
         """Helper pickleable function"""
-        Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+        try:
+            Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+        except Exception:
+            print("Skipping failed run with parameters %s\n" % ", ".join(
+                "%s = %s" % (str(a), str(b)) for a, b in kwargs.items()))
 
     def run_all(self, method="sequential", threads=2):
         """Run all trials. If already run, kept."""
         method = method.lower()
         if method == "sequential":
             for kwargs in tqdm(self.iter_values(), total=len(self)):
-                Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+                try:
+                    Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
+                except Exception:
+                    print("Skipping failed run with parameters %s\n" % ", ".join(
+                        "%s = %s" % (str(a), str(b)) for a, b in kwargs.items()))
         elif method == "multithreading":
             with Pool(threads) as pool:
                 results = [pool.apply_async(self._run_kwargs, kwds=kwargs) for kwargs in self.iter_values()]
