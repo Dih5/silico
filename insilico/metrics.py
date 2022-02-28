@@ -55,19 +55,35 @@ def get_classification_metrics(y, predictions, classes=None):
     return OrderedDict(par_list)
 
 
-def plot_confusion_matrix(m, labels=None, figure_kwargs=None):
+def plot_confusion_matrix(m, labels=None, figure_kwargs=None, normalize=None):
     """
 
     Args:
         m (list of list of float): The confusion matrix.
         labels (list of str): Names of the classes in the order of the confusion matrix.
         figure_kwargs (dict): Parameters to create the Figure.
+        normalize (str): A normalization method to use with the matrix:
+                        - None: No normalization (number of instances).
+                        - "row": Normalize by rows (true in scikit-learn convention).
+                        - "col": Normalize by columns (predicted in scikit-learn convention).
+                        - "all": Normalize by total instances.
 
         Returns:
             Axes: An axes instance for further tweaking.
     """
     import matplotlib
     import seaborn as sns
+
+    m = np.asarray(m)
+
+    if normalize is not None:
+        normalize = normalize.lower()
+        if normalize == "row":
+            m = m / np.sum(m, axis=1).reshape(-1, 1)
+        elif normalize == "col":
+            m = m / np.sum(m, axis=0)
+        elif normalize == "all":
+            m = m / np.sum(m, axis=None)
 
     if figure_kwargs is None:
         figure_kwargs = {}
@@ -89,7 +105,7 @@ def plot_confusion_matrix(m, labels=None, figure_kwargs=None):
     sns.heatmap(m, annot=True, mask=off_diag_mask, cmap='OrRd', vmin=vmin, vmax=vmax, ax=ax, cbar_ax=cax1,
                 xticklabels=labels, yticklabels=labels, cbar_kws=dict(ticks=[]))
 
-    ax.set_xlabel("True class")
-    ax.set_ylabel("Predicted class")
+    ax.set_xlabel("Predicted class")
+    ax.set_ylabel("True class")
 
     return ax
