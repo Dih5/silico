@@ -268,6 +268,27 @@ class Experiment:
         """Get the result of a certain configuration, running it if not available"""
         return Trial(kwargs, self.f, self.store, base_name=self.base_name).load_or_run(add_stats=self.add_stats)
 
+    def status(self):
+        """
+        Report the status of the experiment
+
+        Returns:
+            dict of str: A mapping of statistics of the process, including:
+                             - total: The total number of instances.
+                             - done: The trials already completed.
+        """
+        count = 0
+        total = 0
+        for kwargs in self.iter_values():
+            total += 1
+            try:
+                Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
+                count += 1
+            except FileNotFoundError:
+                pass
+
+        return {"total": total, "done": count}
+
     def get_results_df(self):
         """Get a dataframe with the available results"""
         if pd is None:
