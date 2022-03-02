@@ -4,43 +4,19 @@ Python package to handle in silico experiments
 
 
 ## Installation
-Assuming you have a [Python3](https://www.python.org/) distribution with [pip](https://pip.pypa.io/en/stable/installing/), to install a development version, cd to the directory with this file and:
+Assuming you have a [Python3](https://www.python.org/) distribution with [pip](https://pip.pypa.io/en/stable/installing/):
 
-```
-pip3 install -e .
-```
-As an alternative, a virtualenv might be used to install the package:
-```
-# Prepare a clean virtualenv and activate it
-virtualenv -p /usr/bin/python3.6 venv
-source venv/bin/activate
-# Install the package
-pip3 install -e .
+```bash
+pip3 install insilico
 ```
 
-To install also the dependencies to run the tests or to generate the documentation install some of the extras like
-```
-pip3 install -e '.[docs,test]'
-```
-Mind the quotes.
-
-## Documentation
-To generate the documentation, the *docs* extra dependencies must be installed.
-
-To generate an html documentation with sphinx run:
-```
-make docs
+## Command line interface
+To run the command line interface see:
+```bash
+insilico --help
 ```
 
-To generate a PDF documentation using LaTeX:
-```
-make pdf
-```
-
-
-
-## Test
-To run the unitary tests:
-```
-make test
+If the bin is not in the path you can do instead:
+```bash
+python -m insilico --help
 ```
