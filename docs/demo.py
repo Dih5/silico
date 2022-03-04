@@ -1,7 +1,7 @@
 from numpy import random
 from time import sleep
 
-from insilico import Experiment
+from silico import Experiment
 
 
 def experiment_f(mean, sigma, seed):

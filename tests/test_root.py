@@ -1,5 +1,6 @@
-import insilico
+import silico
+
 
 def test_load():
-	"""Trivial test to if package loads"""
-	assert True
+    """Trivial test to if package loads"""
+    assert True

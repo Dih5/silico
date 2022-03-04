@@ -28,10 +28,10 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
 ## Specific OS configuration
 ifeq ($(OS),Windows_NT)     # is Windows_NT on XP, 2000, 7, Vista, 10...
-    CLEAN_DOCS := CMD /C del /F "docs\insilico.rst" "docs\modules.rst"
+    CLEAN_DOCS := CMD /C del /F "docs\silico.rst" "docs\modules.rst"
     BROWSER := CMD /C start chrome
 else
-    CLEAN_DOCS := 	rm -f docs/insilico.rst docs/modules.rst
+    CLEAN_DOCS := 	rm -f docs/silico.rst docs/modules.rst
 endif
 
 help:
@@ -59,7 +59,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 insilico tests
+	flake8 silico tests
 
 test: ## run tests quickly with the default Python
 	py.test
@@ -68,24 +68,24 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source insilico -m pytest
+	coverage run --source silico -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	$(CLEAN_DOCS)
-	sphinx-apidoc -o docs/ insilico
+	sphinx-apidoc -o docs/ silico
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
-	
+
 pdf: ## generate Sphinx PDF documentation, including API docs
 	$(CLEAN_DOCS)
-	sphinx-apidoc -o docs/ insilico
+	sphinx-apidoc -o docs/ silico
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs latexpdf
-	$(BROWSER) docs/_build/latex/insilico.pdf
+	$(BROWSER) docs/_build/latex/silico.pdf
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .

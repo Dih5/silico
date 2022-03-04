@@ -32,7 +32,7 @@ needs_sphinx = '1.3'  # Napoleon extension
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc',
-'sphinx.ext.viewcode', 
+'sphinx.ext.viewcode',
 'sphinx.ext.napoleon',
 'nbsphinx',
 'IPython.sphinxext.ipython_console_highlighting',
@@ -51,7 +51,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'insilico'
+project = 'silico'
 copyright = "2021, Dih5"
 author = "Dih5"
 
@@ -102,7 +102,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'insilicodoc'
+htmlhelp_basename = 'silicodoc'
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -129,8 +129,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'insilico.tex',
-     'insilico Package Documentation',
+    (master_doc, 'silico.tex',
+     'silico Package Documentation',
      author, 'manual'),
 ]
 
@@ -140,8 +140,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'insilico',
-     'insilico Package Documentation',
+    (master_doc, 'silico',
+     'silico Package Documentation',
      [author], 1)
 ]
 
@@ -152,10 +152,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'insilico',
-     'insilico Package Documentation',
+    (master_doc, 'silico',
+     'silico Package Documentation',
      author,
-     'insilico',
+     'silico',
      'One line description of project.',
      'Miscellaneous'),
 ]

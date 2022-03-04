@@ -9,7 +9,7 @@ from .base import Experiment
 
 @click.group()
 def cli():
-    """Insilico command line utilities"""
+    """Silico command line utilities"""
     pass
 
 

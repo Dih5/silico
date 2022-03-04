@@ -1,5 +1,5 @@
-insilico
-========
+silico
+======
 
 .. toctree::
    :maxdepth: 2

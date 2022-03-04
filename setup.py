@@ -34,10 +34,10 @@ setup(author="Dih5",
       keywords=[],
       long_description=long_description,
       long_description_content_type='text/markdown',
-      name='insilico',
-      packages=find_packages(include=['insilico'], exclude=["demos", "tests", "docs"]),
+      name='silico',
+      packages=find_packages(include=['silico'], exclude=["demos", "tests", "docs"]),
       install_requires=["numpy", "pandas", "scipy"],
-      url='https://github.com/Dih5/insilico',
+      url='https://github.com/Dih5/silico',
       version='0.1.0',
 
       )

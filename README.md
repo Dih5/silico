@@ -1,4 +1,4 @@
-# insilico
+# silico
 
 Python package to handle in silico experiments
 
@@ -7,16 +7,16 @@ Python package to handle in silico experiments
 Assuming you have a [Python3](https://www.python.org/) distribution with [pip](https://pip.pypa.io/en/stable/installing/):
 
 ```bash
-pip3 install insilico
+pip3 install silico
 ```
 
 ## Command line interface
 To run the command line interface see:
 ```bash
-insilico --help
+silico --help
 ```
 
 If the bin is not in the path you can do instead:
 ```bash
-python -m insilico --help
+python -m silico --help
 ```
