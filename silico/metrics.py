@@ -84,6 +84,8 @@ def plot_confusion_matrix(m, labels=None, figure_kwargs=None, normalize=None):
             m = m / np.sum(m, axis=0)
         elif normalize == "all":
             m = m / np.sum(m, axis=None)
+        else:
+            raise ValueError("Invalid normalize value. Available options are: None, 'row', 'col' 'all'.")
 
     if figure_kwargs is None:
         figure_kwargs = {}
