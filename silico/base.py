@@ -75,13 +75,11 @@ class Trial:
         """Execute the trial"""
         return self.f(**self.kwargs)
 
-    def run_and_save(self, add_stats=False):
+    def run_and_save(self, add_stats=True):
         """Execute the trial and store the results as a pickle and in the db"""
+        start = datetime.now()
+        result = self.run()
         if add_stats:
-            result = self.run()
-        else:
-            start = datetime.now()
-            result = self.run()
             elapsed = datetime.now() - start
             result = {"_run_start": str(start), "_elapsed_seconds": elapsed.total_seconds(), **result}
         pickle.dump(result, open(os.path.join(self.base_path, self.get_file_name()), "wb"))
@@ -91,7 +89,7 @@ class Trial:
         """Load the results of the trial if available"""
         return pickle.load(open(os.path.join(self.base_path, self.get_file_name()), "rb"))
 
-    def load_or_run(self, add_stats=False):
+    def load_or_run(self, add_stats=True):
         """Load the results if available, otherwise running the trial, storing the results, and returning them"""
         try:
             return self.load()
@@ -166,7 +164,7 @@ def implicit_variable_cast(variable):
 class Experiment:
     """An experiment"""
 
-    def __init__(self, variables, f, store, base_name=None, add_stats=False, strategy="grid", mid_point=None):
+    def __init__(self, variables, f, store, base_name=None, add_stats=True, strategy="grid", mid_point=None):
         """
 
         Args:
