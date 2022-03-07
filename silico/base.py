@@ -8,6 +8,7 @@ import pickle
 from glob import glob
 from datetime import datetime
 from multiprocessing import Pool
+import traceback
 
 from functools import reduce
 
@@ -78,7 +79,13 @@ class Trial:
     def run_and_save(self, add_stats=True):
         """Execute the trial and store the results as a pickle and in the db"""
         start = datetime.now()
-        result = self.run()
+        try:
+            result = self.run()
+        except Exception as e:
+            if add_stats:
+                result = {"_error": traceback.format_exc()}
+            else:
+                raise e
         if add_stats:
             elapsed = datetime.now() - start
             result = {"_run_start": str(start), "_elapsed_seconds": elapsed.total_seconds(), **result}
@@ -251,14 +258,25 @@ class Experiment:
         else:
             raise ValueError("Invalid method")
 
-    def iter_results(self):
+    def iter_results(self, skip_errors=True):
         """Iterate pairs of kwargs, results
 
-        If a result is not available, it is skipped
+        If a result is not available, it is skipped. Error behaviour depends on the skip_errors parameter.
+
+        Args:
+            skip_errors (bool): Whether to ignore errors. If false, an "_error" key mapping to the trace will be
+                                available.
+
+        Yields:
+            2-tuple of dict: Pairs of kwargs and results of trials.
+
         """
         for kwargs in self.iter_values():
             try:
-                yield kwargs, Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
+                result = Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
+                if skip_errors and isinstance(result, dict) and "_error" in result:
+                    continue
+                yield kwargs, result
             except FileNotFoundError:  # Not available
                 pass
 
@@ -274,26 +292,40 @@ class Experiment:
             dict of str: A mapping of statistics of the process, including:
                              - total: The total number of instances.
                              - done: The trials already completed.
+                             - errors: The number of detected errors in the trials already completed.
+
         """
         count = 0
         total = 0
+        errors = 0
         for kwargs in self.iter_values():
             total += 1
             try:
-                Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
+                result = Trial(kwargs, self.f, self.store, base_name=self.base_name).load()
                 count += 1
+                if isinstance(result, dict) and "_error" in result:
+                    errors += 1
             except FileNotFoundError:
                 pass
 
-        return {"total": total, "done": count}
+        return {"total": total, "done": count, "errors": errors}
 
-    def get_results_df(self):
-        """Get a dataframe with the available results"""
+    def get_results_df(self, skip_errors=True):
+        """
+        Get a dataframe with the available results
+
+        Args:
+            skip_errors (bool): Whether to ignore errors. If false, an "_error" column with the trace will be available
+
+        Returns:
+            pd.DataFrame: The dataframe with the results.
+
+        """
         if pd is None:
             raise ModuleNotFoundError("The pandas package is required")
 
         results = []
-        for kwargs, result in self.iter_results():
+        for kwargs, result in self.iter_results(skip_errors=skip_errors):
             if isinstance(result, dict):
                 # TODO: Ensure no overlapping
                 results.append({**kwargs, **result})

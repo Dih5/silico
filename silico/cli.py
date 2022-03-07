@@ -52,7 +52,11 @@ def status(file, experiment):
     if e is None:
         return 1
     d = e.status()
-    print("%d/%d (%g %%)" % (d["done"], d["total"], d["done"] / d["total"] * 100))
+    print("%d/%d (%g %%) trials done." % (d["done"], d["total"], d["done"] / d["total"] * 100))
+    if d["errors"]:
+        print("%d/%d (%g %%) errors found." % (d["errors"], d["done"], d["errors"] / d["done"] * 100))
+    else:
+        print("No errors found.")
 
 
 @cli.command()
