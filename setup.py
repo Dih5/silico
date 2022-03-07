@@ -36,7 +36,7 @@ setup(author="Dih5",
       long_description_content_type='text/markdown',
       name='silico',
       packages=find_packages(include=['silico'], exclude=["demos", "tests", "docs"]),
-      install_requires=["numpy", "pandas", "scipy"],
+      install_requires=["numpy", "pandas", "scipy", "scikit-learn"],
       url='https://github.com/Dih5/silico',
       version='0.1.0',
 
