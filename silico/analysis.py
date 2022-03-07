@@ -77,6 +77,9 @@ def format_mag_err(mag, err, sep=" ± ", increase=0, increase_ones=True):
     if np.isnan(err):
         return "%s%s%s" % (mag, sep, err)
 
+    if err == 0:  # Zero error
+        return "%s%s%s" % (mag, sep, 0)
+
     order = floor(log10(err))
     if increase_ones and floor(err / 10 ** order) == 1.0:  # If flag on and leading digit is 1
         order -= 1
