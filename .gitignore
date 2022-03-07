@@ -105,3 +105,6 @@ ENV/
 # PyCharm
 .idea/
 
+# Test-generated data
+test-data
+
