@@ -1,4 +1,8 @@
 # silico
+[![Github release](https://img.shields.io/github/release/Dih5/silico.svg)](https://github.com/Dih5/silico/releases/latest)
+[![PyPI](https://img.shields.io/pypi/v/silico.svg)](https://pypi.python.org/pypi/silico)
+
+[![Documentation Status](https://readthedocs.org/projects/silico/badge/?version=latest)](http://silico.readthedocs.io/en/latest/?badge=latest)
 
 Python package to handle in silico experiments
 
