@@ -183,6 +183,8 @@ class Experiment:
                               will fail.
             strategy (str): A method defining how the parameter space is explore. Available options are:
                             - "grid": Explore a grid in order (cartesian product)
+                            - "urinal": Explore the grid picking point with the urinal convention (as far as possible
+                                        from already explored points).
                             - "star": Consider only variations of each of the parameters. The "standard" point can
                                       be defined with the mid_point parameter.
             mid_point (dict of str): A mapping of parameters to their "default" values. Used if strategy is "star". The
@@ -198,7 +200,7 @@ class Experiment:
 
         self.strategy = strategy
 
-        if strategy == "grid":
+        if strategy in ["grid", "urinal"]:
             self._len = prod(len(v) for v in self.variables)
         elif strategy == "star":
             if mid_point is not None:
@@ -209,6 +211,8 @@ class Experiment:
 
             # Sum of lengths, but do not repeat the mid_point
             self._len = sum(len(v) for v in self.variables) - len(self.variables) + 1
+        else:
+            raise ValueError("Invalid strategy")
 
         ensure_dir_exists(store)
 
@@ -228,6 +232,13 @@ class Experiment:
                 for value in v.iter_values():
                     if value != mid_point[v.name]:  # Do not repeat mid point
                         yield {**mid_point, **{v.name: value}}
+        elif self.strategy == "urinal":
+            from .urinal import urinal_iteration
+            items = [list(v.iter_values()) for v in self.variables]
+
+            for indices in urinal_iteration([len(l) for l in items]):
+                yield {name: values[i] for name, values, i in zip(names, items, indices)}
+
 
         else:
             raise ValueError("Invalid value for parameter strategy.")
