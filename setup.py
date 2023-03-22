@@ -26,6 +26,12 @@ setup(author="Dih5",
           'Programming Language :: Python :: 3.10',
       ],
       description='Python package to handle in silico experiments',
+      entry_points={
+          'console_scripts': [
+              'silico=silico.cli:cli',
+          ],
+
+      },
       extras_require={
           "docs": ["nbsphinx", "sphinx-rtd-theme", "IPython"],
           "test": ["pytest"],
