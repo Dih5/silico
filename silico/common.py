@@ -1,5 +1,17 @@
 import warnings
 
+# prod
+try:
+    from math import prod
+except ImportError:
+    from functools import reduce
+    from operator import mul
+
+
+    def prod(i):
+        """Product of a list of numbers"""
+        return reduce(mul, i, 1)
+
 
 def is_notebook():
     """Detect if running in a notebook"""

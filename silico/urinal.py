@@ -1,19 +1,11 @@
 """Urinal protocol iteration"""
 
-try:
-    from math import prod
-except ImportError:
-    from functools import reduce
-    import operator
-
-
-    def prod(i):
-        return reduce(operator.mul, i, 1)
-
 from itertools import product
 from collections import deque
 
 import numpy as np
+
+from .common import prod
 
 
 def distance_matrix(indices, shape, p=2):

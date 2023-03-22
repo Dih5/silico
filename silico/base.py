@@ -10,8 +10,6 @@ from datetime import datetime
 from multiprocessing import Pool
 import traceback
 
-from functools import reduce
-
 try:
     import pandas as pd
 except ImportError:
@@ -30,10 +28,7 @@ except ImportError:
             return args[0]
         return kwargs["iterable"]
 
-
-def prod(i):
-    """Product of a list of numbers"""
-    return reduce(lambda x, y: x * y, i, 1)
+from .common import prod, set_kwargs
 
 
 def _hash_function(w):
@@ -370,16 +365,6 @@ class Experiment:
                     pass
 
 
-def _set_kwarg(f, fixed_kwargs):
-    """Closure of a function fixing a kwarg"""
-
-    def f2(*args, **kwargs):
-        fixed_kwargs2 = {k: v for k, v in fixed_kwargs.items() if k not in kwargs}
-        return f(*args, **fixed_kwargs2, **kwargs)
-
-    return f2
-
-
 class SubExperiment(Experiment):
     """An restriction of an experiment, where some of its variables are fixed"""
 
@@ -393,6 +378,6 @@ class SubExperiment(Experiment):
         """
 
         variables = [a for a in original.variables if a.name not in fixed]
-        f = _set_kwarg(original.f, fixed)
+        f = set_kwargs(original.f, fixed)
         store = original.store
         super().__init__(variables, f, store)
