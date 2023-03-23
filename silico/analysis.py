@@ -7,18 +7,19 @@ import pandas as pd
 
 def paired_t_test(df, col_left, col_right, common_col="seed"):
     """
+    Perform and summarize unilateral t-test to decide a difference between columns is significant.
 
-    Considered calling .round(5) on output for clearer reading.
+    Considered calling .round(5) or alike on output for clearer reading.
 
     Args:
         df (pd.DataFrame): The results of the experiment.
-        col_left: Identifier of the column
-        col_right:
-        common_col: Identifier of the column indexing the repetitions of the experiments.
+        col_left (str): Name of the "left" column to compare
+        col_right (str): Name of the "left" column to compare
+        common_col (str): Identifier of the column indexing the repetitions of the experiments.
 
     Returns:
-        pd.Dataframe: Dataframe with the mean values of the left and right column, as well as p-values of unilateral
-                      tests.
+        pd.Dataframe: Dataframe with the mean values of the left and right column, as well as the p-values of unilateral
+                      tests. p-value-less corresponds to the test with alternative hypothesis col_left < col_right.
 
     """
     # TODO: Single level not considered
