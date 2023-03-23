@@ -34,7 +34,7 @@ def paired_t_test(df, col_left, col_right, common_col="seed"):
 
     df_out = pd.concat(
         (
-            df.groupby(group_cols).agg("mean"),
+            df.groupby(group_cols)[[col_left, col_right]].agg("mean"),
             pd.Series(
                 df_eval.apply(
                     lambda row: ttest_rel(
