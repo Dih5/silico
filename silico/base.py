@@ -15,13 +15,8 @@ try:
 except ImportError:
     pd = None
 
-from .common import is_notebook
-
 try:
-    if not is_notebook():
-        from tqdm import tqdm
-    else:
-        from tqdm.notebook import tqdm
+    from tqdm.auto import tqdm
 except ImportError:
     def tqdm(*args, **kwargs):
         if args:
