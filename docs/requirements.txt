@@ -1,3 +1,4 @@
 nbsphinx
 ipykernel
 sphinx-rtd-theme
+-r ../requirements.txt
