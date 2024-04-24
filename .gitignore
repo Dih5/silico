@@ -108,3 +108,5 @@ ENV/
 # Test-generated data
 test-data
 
+# Doc-generated data
+docs/experiment**
