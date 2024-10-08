@@ -1,6 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+import os
+import sys
 import importlib
 
 import click
@@ -17,6 +19,12 @@ def get_experiment(file, experiment=None, report=True):
     """Load an experiment from a script where it is defined"""
     if file.lower().endswith(".py"):
         file = file[:-3]
+
+    # Ensure the cwd is in the path
+    cwd = os.getcwd()
+    if cwd not in sys.path:
+        sys.path.append(cwd)
+
     m = importlib.import_module(file)
     candidates = {k: e for k, e in m.__dict__.items() if isinstance(e, Experiment)}
     if experiment is not None:
