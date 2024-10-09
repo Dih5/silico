@@ -1,6 +1,6 @@
 """silico - Python package to handle in silico experiments"""
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Dih5 <dihedralfive@gmail.com>'
 
 from .base import Experiment, Variable, SubExperiment
