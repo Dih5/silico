@@ -108,9 +108,9 @@ def run_cui(module_name):
         stdscr.addstr(line, error_cells + done_cells, bar[error_cells + done_cells:], curses.color_pair(3))  # Grey for remaining
 
 
-    def wait_for_key(stdscr, line, message="Press a key to continue"):
+    def wait_for_key(stdscr, line, message="Press any key to continue..."):
         """Displays a message and waits for any key press."""
-        stdscr.addstr(line, 0, message)
+        stdscr.addstr(line, 0, message, curses.A_BOLD | curses.A_UNDERLINE)
         stdscr.refresh()
         stdscr.getch()
 
