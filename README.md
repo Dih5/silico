@@ -26,3 +26,9 @@ If the bin is not in the path you can do instead:
 ```bash
 python -m silico --help
 ```
+
+## Character User Interface (curses)
+To run a CUI to handle running the experiment(s) defined in a module:
+```bash
+python -m silico.cui <modulee>
+```
